@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kalkulator Huruf</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background-color: #f0f4f8;
+      color: #333;
+    }
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+      max-width: 800px;
+      margin: auto;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #999;
+      cursor: not-allowed;
+    }
+    #start-button, #save-button, #back-button {
+      display: block;
+      margin: 20px auto;
+      font-size: 1rem;
+    }
+    #action-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+    .centered {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .img-button {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .img-button:hover {
+      transform: scale(1.1);
+    }
+    .img-button:active {
+      transform: scale(0.95);
+    }
+    .btn-blue {
+      background-color: #007bff;
+    }
+    .btn-blue:hover {
+      background-color: #0056b3;
+    }
+    .btn-green {
+      background-color: #28a745;
+    }
+    .btn-red {
+      background-color: #dc3545;
+    }
+    .icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Autoclave</h2>
+
+  <div class="centered">
+    <label>Set semua huruf ke: </label>
+    <input type="number" id="set-all-value" value="0" onchange="setAllValues(this.value)">
+    <button onclick="applySetAll()" class="btn-blue">Terapkan ke semua</button>
+  </div>
+
+  <div id="input-section" class="grid"></div>
+  <button id="start-button" onclick="startApp()" class="btn-blue">Mulai</button>
+
+  <div id="calculator" class="grid" style="display:none;"></div>
+
+  <div id="action-buttons" style="display:none;">
+    <div>
+      <button onclick="undoLastAction()" class="btn-blue">Undo</button>
+      <button onclick="resetApp()" class="btn-red">Home</button>
+      <button onclick="redoLastAction()" class="btn-blue">Redo</button>
+    </div>
+    <button onclick="saveValues()" class="btn-green">Save</button>
+  </div>
+
+  <div id="result" style="display:none; text-align:center; margin-top: 30px;"></div>
+  <button id="back-button" onclick="resetApp()" class="btn-red" style="display:none;">Kembali ke Awal</button>
+
+  <div id="confirm-reset" style="display:none; text-align: center; margin-top: 20px;">
+    <p>Apakah Anda yakin ingin kembali ke halaman awal?</p>
+    <button onclick="confirmReset(true)" class="btn-red">Ya</button>
+    <button onclick="confirmReset(false)" class="btn-blue">Tidak</button>
+  </div>
+
+  <script>
+    const letters = ["Sponge", "Scalple", "Anesthetic", "Antiseptic", "Antibiotics", "Splint", "Stitches", "Pins", "Transfusion", "Defibrillator", "Clamp", "Ultrasound", "Lab Kit"];
+    const values = {};
+    let saved = false;
+    let history = [];
+    let future = [];
+
+    const inputSection = document.getElementById('input-section');
+    const calculator = document.getElementById('calculator');
+    const result = document.getElementById('result');
+
+    const imageMap = {
+      "Sponge": "sponge-icon.png",
+      "Scalple": "scalple-icon.png",
+      "Anesthetic": "anesthetic-icon.png",
+      "Antiseptic": "Antiseptic-icon.png",
+      "Antibiotics": "Antibiotics-icon.png",
+      "Splint": "Splint-icon.png",
+      "Stitches": "Stitches-icon.png",
+      "Pins": "Pins-icon.png",
+      "Transfusion": "Transfusion-icon.png",
+      "Defibrillator": "Defibrillator-icon.png",
+      "Clamp": "Clamp-icon.png",
+      "Ultrasound": "Ultrasound-icon.png",
+      "Lab Kit": "Lab-Kit-icon.png",
+    };
+
+    // generate input awal
+    letters.forEach(letter => {
+      values[letter] = 0;
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <img src="${imageMap[letter]}" alt="${letter}" class="icon">
+        <div style="font-size: 0.85rem; margin-top: 5px;">${letter}</div>
+        <input type="number" id="input-${letter}" value="0">
+      `;
+      inputSection.appendChild(div);
+    });
+
+    function setAllValues(val) {
+      letters.forEach(letter => {
+        document.getElementById(`input-${letter}`).value = val;
+      });
+    }
+
+    function applySetAll() {
+      const val = parseInt(document.getElementById('set-all-value').value) || 0;
+      setAllValues(val);
+    }
+
+    function startApp() {
+      letters.forEach(letter => {
+        const val = parseInt(document.getElementById(`input-${letter}`).value) || 0;
+        values[letter] = val;
+      });
+      inputSection.style.display = 'none';
+      document.getElementById('start-button').style.display = 'none';
+      document.querySelector('.centered').style.display = 'none';
+      calculator.style.display = 'grid';
+      document.getElementById('action-buttons').style.display = 'flex';
+      renderCalculator();
+    }
+
+    function renderCalculator() {
+      calculator.innerHTML = '';
+      letters.forEach(letter => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const isDisabled = saved || values[letter] < 20;
+        card.innerHTML = `
+          <img src="${imageMap[letter]}" alt="${letter}" class="img-button" ${isDisabled ? '' : `onclick="pressLetter('${letter}')"`}>
+          <div style="font-size: 0.85rem; font-weight: bold; margin-top: 5px;">${letter}</div>
+          <div id="val-${letter}" style="font-size: 1rem; margin: 5px 0;">${values[letter]}</div>
+        `;
+        calculator.appendChild(card);
+      });
+    }
+
+    function pressLetter(clickedLetter) {
+      if (saved || values[clickedLetter] < 20) return;
+
+      const currentSnapshot = { ...values };
+      history.push(currentSnapshot);
+      future = [];
+
+      values[clickedLetter] -= 20;
+      letters.forEach(letter => {
+        if (letter !== clickedLetter) {
+          values[letter] += 1;
+        }
+      });
+      renderCalculator();
+    }
+
+    function undoLastAction() {
+      if (history.length === 0 || saved) return;
+      const lastState = history.pop();
+      const currentSnapshot = { ...values };
+      future.push(currentSnapshot);
+      letters.forEach(letter => {
+        values[letter] = lastState[letter];
+      });
+      renderCalculator();
+    }
+
+    function redoLastAction() {
+      if (future.length === 0 || saved) return;
+      const nextState = future.pop();
+      const currentSnapshot = { ...values };
+      history.push(currentSnapshot);
+      letters.forEach(letter => {
+        values[letter] = nextState[letter];
+      });
+      renderCalculator();
+    }
+
+    function saveValues() {
+      saved = true;
+      renderCalculator();
+      document.getElementById('action-buttons').style.display = 'none';
+      document.getElementById('back-button').style.display = 'block';
+      result.style.display = 'block';
+
+      let output = `
+        <h3>Hasil Akhir:</h3>
+        <ul style="
+          list-style: none;
+          padding: 0;
+          margin: 0 auto;
+          max-width: 600px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        ">
+      `;
+
+      letters.forEach(letter => {
+        output += `
+          <li style="
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          ">
+            <img src="${imageMap[letter]}" alt="${letter}" style="width:40px; height:40px; margin-right:15px;">
+            <span style="font-size: 0.95rem;"><strong>${letter}:</strong> ${values[letter]}</span>
+          </li>
+        `;
+      });
+
+      output += '</ul>';
+      result.innerHTML = output;
+    }
+
+    function resetApp() {
+      document.getElementById('confirm-reset').style.display = 'block';
+    }
+
+    function confirmReset(agree) {
+      if (agree) {
+        location.reload();
+      } else {
+        document.getElementById('confirm-reset').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
