@@ -98,12 +98,12 @@
   </style>
 </head>
 <body>
-  <h2>Autoclave</h2>
+  <h2>Autoclave Growtopia</h2>
 
   <div class="centered">
-    <label>Set semua huruf ke: </label>
+    <label>Set all tools to : </label>
     <input type="number" id="set-all-value" value="0" onchange="setAllValues(this.value)">
-    <button onclick="applySetAll()" class="btn-blue">Terapkan ke semua</button>
+    <button onclick="applySetAll()" class="btn-blue">Enter</button>
   </div>
 
   <div id="input-section" class="grid"></div>
@@ -141,22 +141,21 @@
     const result = document.getElementById('result');
 
     const imageMap = {
-      "Sponge": "/tools_icon/sponge-icon.png",
-      "Scalple": "/tools_icon/scalple-icon.png",
-      "Anesthetic": "/tools_icon/anesthetic-icon.png",
-      "Antiseptic": "/tools_icon/Antiseptic-icon.png",
-      "Antibiotics": "/tools_icon/Antibiotics-icon.png",
-      "Splint": "/tools_icon/Splint-icon.png",
-      "Stitches": "/tools_icon/Stitches-icon.png",
-      "Pins": "/tools_icon/Pins-icon.png",
-      "Transfusion": "/tools_icon/Transfusion-icon.png",
-      "Defibrillator": "/tools_icon/Defibrillator-icon.png",
-      "Clamp": "/tools_icon/Clamp-icon.png",
-      "Ultrasound": "/tools_icon/Ultrasound-icon.png",
-      "Lab Kit": "/tools_icon/Lab-Kit-icon.png",
+      "Sponge": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/sponge-icon.png",
+      "Scalple": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/scalple-icon.png",
+      "Anesthetic": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/anesthetic-icon.png",
+      "Antiseptic": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/antiseptic-icon.png",
+      "Antibiotics": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/antibiotics-icon.png",
+      "Splint": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/splint-icon.png",
+      "Stitches": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/stitches-icon.png",
+      "Pins": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/pins-icon.png",
+      "Transfusion": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/transfusion-icon.png",
+      "Defibrillator": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/defibrillator-icon.png",
+      "Clamp": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/clamp-icon.png",
+      "Ultrasound": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/ultrasound-icon.png",
+      "Lab Kit": "https://raw.githubusercontent.com/TTLThunder/autoclave_growtopia/main/tools_icon/lab-kit-icon.png",
     };
 
-    // generate input awal
     letters.forEach(letter => {
       values[letter] = 0;
       const div = document.createElement('div');
